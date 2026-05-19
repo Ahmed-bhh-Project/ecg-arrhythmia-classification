@@ -1,0 +1,499 @@
+{% extends "base.html" %}
+
+{% block title %}Informations sur les Arythmies - CardioScan{% endblock %}
+
+{% block content %}
+<div class="info-container">
+  <h1 class="info-title">Types d'Arythmies Cardiaques</h1>
+  <p class="info-description">
+    Les arythmies cardiaques sont des perturbations du rythme normal du cœur.
+    Elles peuvent être bénignes ou potentiellement mortelles.
+    Notre système est capable de détecter et classifier 8 types différents d'ECGs.
+  </p>
+
+  <div class="arrhythmia-grid">
+    <!-- Rythme normal -->
+    <div class="arrhythmia-card" data-arrhythmia="normal">
+      <div class="card-header normal">
+        <h3>Rythme Normal (NOR)</h3>
+      </div>
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='normal.jpg') }}" class="ecg-image" alt="ECG Normal">
+        <div class="card-description">
+          <p>
+            Le rythme cardiaque normal présente des ondes P régulières suivies de complexes QRS et ondes T.
+            La fréquence se situe généralement entre 60 et 100 battements par minute.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fibrillation Ventriculaire -->
+    <div class="arrhythmia-card" data-arrhythmia="vfe">
+      <div class="card-header danger">
+        <h3>Fibrillation Ventriculaire (VFE)</h3>
+      </div>
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='vf.jpg') }}" class="ecg-image" alt="Fibrillation Ventriculaire">
+        <div class="card-description">
+          <p>
+            Rythme cardiaque chaotique et désorganisé où les ventricules tremblent au lieu de se contracter.
+            C'est une urgence médicale qui nécessite une défibrillation immédiate.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contraction Auriculaire Prématurée -->
+    <div class="arrhythmia-card" data-arrhythmia="apc">
+      <div class="card-header apc">
+        <h3>Contraction Auriculaire Prématurée (APC)</h3>
+      </div>
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='pac.jpg') }}" class="ecg-image" alt="Contraction Auriculaire Prématurée">
+        <div class="card-description">
+          <p>
+            Battements prématurés qui naissent dans les oreillettes et se caractérisent par une onde P
+            précoce et différente suivie d'un complexe QRS généralement normal.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contraction Ventriculaire Prématurée -->
+    <div class="arrhythmia-card" data-arrhythmia="pvc">
+      <div class="card-header pvc">
+        <h3>Contraction Ventriculaire Prématurée (PVC)</h3>
+      </div>
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='pvc.jpg') }}" class="ecg-image" alt="Contraction Ventriculaire Prématurée">
+        <div class="card-description">
+          <p>
+            Battements prématurés originaires des ventricules, caractérisés par des complexes QRS
+            larges et souvent bizarres, sans onde P précédente.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloc de Branche Droit -->
+    <div class="arrhythmia-card" data-arrhythmia="rbbb">
+      <div class="card-header rbbb">
+        <h3>Bloc de Branche Droit (RBBB)</h3>
+      </div>
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='rbbb.jpg') }}" class="ecg-image" alt="Bloc de Branche Droit">
+        <div class="card-description">
+          <p>
+            Retard ou blocage de la conduction électrique dans la branche droite du faisceau de His.
+            Caractérisé par un complexe QRS large avec un aspect rsR' en V1.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloc de Branche Gauche -->
+    <div class="arrhythmia-card" data-arrhythmia="lbbb">
+      <div class="card-header lbbb">
+        <h3>Bloc de Branche Gauche (LBBB)</h3>
+      </div>
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='lbbb.jpg') }}" class="ecg-image" alt="Bloc de Branche Gauche">
+        <div class="card-description">
+          <p>
+            Retard ou blocage de la conduction électrique dans la branche gauche du faisceau de His.
+            Le complexe QRS est élargi avec un aspect dominé par R en V6 et I.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Battement Ectopique Ventriculaire -->
+    <div class="arrhythmia-card" data-arrhythmia="veb">
+      <div class="card-header veb">
+        <h3>Battement Ectopique Ventriculaire (VEB)</h3>
+      </div>
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='pvc.jpg') }}" class="ecg-image" alt="Battement Ectopique Ventriculaire">
+        <div class="card-description">
+          <p>
+            Battements originaires des ventricules, hors du nœud sinusal normal.
+            Ils apparaissent comme des complexes QRS élargis et déformés.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloc Auriculaire Prématuré -->
+    <div class="arrhythmia-card" data-arrhythmia="pab">
+      <div class="card-header pab">
+        <h3>Bloc Auriculaire Prématuré (PAB)</h3>
+      </div>
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='pac.jpg') }}" class="ecg-image" alt="Bloc Auriculaire Prématuré">
+        <div class="card-description">
+          <p>
+            Retard ou blocage de la conduction entre les oreillettes et les ventricules.
+            Peut se manifester par des ondes P non suivies de complexes QRS.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay pour afficher l'image en plein écran -->
+<div class="image-fullscreen-overlay" id="imageFullscreenOverlay">
+  <button class="close-overlay"><i class="fas fa-times"></i></button>
+  <div class="fullscreen-image-container">
+    <img src="" id="fullscreenImage" alt="ECG en plein écran">
+    <h3 id="fullscreenTitle" class="fullscreen-title"></h3>
+    <p id="fullscreenDescription" class="fullscreen-description"></p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .info-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Roboto', Arial, sans-serif;
+  }
+
+  .info-title {
+    color: #1a5276;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    font-weight: 600;
+    border-bottom: 2px solid #eaf2f8;
+    padding-bottom: 15px;
+  }
+
+  .info-description {
+    text-align: center;
+    color: #34495e;
+    max-width: 800px;
+    margin: 0 auto 50px auto;
+    line-height: 1.7;
+    font-size: 1.1rem;
+    font-weight: 400;
+  }
+
+  .arrhythmia-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+  }
+
+  .arrhythmia-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #f0f0f0;
+  }
+
+  .arrhythmia-card:after {
+    content: "Cliquez pour agrandir";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .arrhythmia-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+  }
+
+  .arrhythmia-card:hover:after {
+    opacity: 1;
+  }
+
+  .card-header {
+    padding: 18px 20px;
+    color: white;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .card-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  /* Palette de couleurs professionnelle pour les cartes */
+  .normal {
+    background-color: #3498db;
+    color: white;
+  }
+
+  .danger {
+    background-color: #e74c3c;
+    color: white;
+  }
+
+  .apc {
+    background-color: #f39c12;
+    color: white;
+  }
+
+  .pvc {
+    background-color: #9b59b6;
+    color: white;
+  }
+
+  .rbbb {
+    background-color: #2ecc71;
+    color: white;
+  }
+
+  .lbbb {
+    background-color: #16a085;
+    color: white;
+  }
+
+  .veb {
+    background-color: #8e44ad;
+    color: white;
+  }
+
+  .pab {
+    background-color: #d35400;
+    color: white;
+  }
+
+  .card-body {
+    padding: 20px;
+    background-color: white;
+  }
+
+  .ecg-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #f5f5f5;
+    transition: transform 0.3s ease;
+  }
+
+  .arrhythmia-card:hover .ecg-image {
+    transform: scale(1.02);
+  }
+
+  .card-description {
+    color: #34495e;
+    font-size: 1rem;
+    line-height: 1.6;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+  }
+
+  .normal + .card-body .card-description {
+    border-left-color: #3498db;
+  }
+
+  .danger + .card-body .card-description {
+    border-left-color: #e74c3c;
+  }
+
+  .apc + .card-body .card-description {
+    border-left-color: #f39c12;
+  }
+
+  .pvc + .card-body .card-description {
+    border-left-color: #9b59b6;
+  }
+
+  .rbbb + .card-body .card-description {
+    border-left-color: #2ecc71;
+  }
+
+  .lbbb + .card-body .card-description {
+    border-left-color: #16a085;
+  }
+
+  .veb + .card-body .card-description {
+    border-left-color: #8e44ad;
+  }
+
+  .pab + .card-body .card-description {
+    border-left-color: #d35400;
+  }
+
+  /* Styles pour l'overlay d'image en plein écran */
+  .image-fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+
+  .image-fullscreen-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .fullscreen-image-container {
+    width: 90%;
+    max-width: 1000px;
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.05);
+    border-radius: 12px;
+  }
+
+  #fullscreenImage {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 8px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+
+  .fullscreen-title {
+    color: white;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+
+  .fullscreen-description {
+    color: #ecf0f1;
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    text-align: left;
+    background-color: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .close-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .close-overlay:hover {
+    background-color: rgba(255,255,255,0.2);
+    transform: rotate(90deg);
+  }
+
+  @media (max-width: 768px) {
+    .arrhythmia-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .fullscreen-image-container {
+      width: 95%;
+    }
+    
+    .info-title {
+      font-size: 2rem;
+    }
+    
+    .card-header h3 {
+      font-size: 1.3rem;
+    }
+    
+    .fullscreen-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sélectionner toutes les cartes d'arythmie
+    const arrhythmiaCards = document.querySelectorAll('.arrhythmia-card');
+    const imageOverlay = document.getElementById('imageFullscreenOverlay');
+    const closeOverlayBtn = document.querySelector('.close-overlay');
+    const fullscreenImage = document.getElementById('fullscreenImage');
+    const fullscreenTitle = document.getElementById('fullscreenTitle');
+    const fullscreenDescription = document.getElementById('fullscreenDescription');
+
+    // Ajouter un écouteur d'événement à chaque carte
+    arrhythmiaCards.forEach(card => {
+      card.addEventListener('click', function() {
+        const imageSrc = this.querySelector('.ecg-image').src;
+        const title = this.querySelector('.card-header h3').textContent;
+        const description = this.querySelector('.card-description p').textContent;
+
+        // Afficher l'image et les informations en plein écran
+        fullscreenImage.src = imageSrc;
+        fullscreenTitle.textContent = title;
+        fullscreenDescription.textContent = description;
+        
+        imageOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Empêcher le défilement
+      });
+    });
+
+    // Fermer l'overlay lorsqu'on clique sur le bouton de fermeture
+    closeOverlayBtn.addEventListener('click', function() {
+      imageOverlay.classList.remove('active');
+      document.body.style.overflow = 'auto'; // Réactiver le défilement
+    });
+
+    // Fermer l'overlay lorsqu'on clique en dehors de l'image
+    imageOverlay.addEventListener('click', function(event) {
+      if (event.target === imageOverlay) {
+        imageOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    // Fermer l'overlay avec la touche Echap
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && imageOverlay.classList.contains('active')) {
+        imageOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    });
+  });
+</script>
+{% endblock %}

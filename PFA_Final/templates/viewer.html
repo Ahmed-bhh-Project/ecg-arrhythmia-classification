@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Battement détecté{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="left">
+    <img src="{{ url_for('static', filename='coeur.png') }}" alt="Cœur" />
+  </div>
+
+  <div class="right">
+    <h1>🧠 Battement {{ index + 1 }} sur {{ total }}</h1>
+    <p><strong>Classe prédite :</strong> <span style="color:red;">{{ beat.class }}</span></p>
+    <p><strong>Position dans le signal :</strong> {{ beat.original_index }}</p>
+
+    <img src="{{ url_for('static', filename='beats/' + beat.filename) }}"
+         style="width: 256px; border-radius: 15px; margin: 20px 0;
+         box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />
+
+    <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+      {% if index > 0 %}
+        <a href="{{ url_for('next_beat', index=index - 1) }}" class="cta-button">⬅️ Précédent</a>
+      {% endif %}
+      {% if index + 1 < total %}
+        <a href="{{ url_for('next_beat', index=index + 1) }}" class="cta-button">➡️ Suivant</a>
+      {% endif %}
+    </div>
+
+    {% if bpm and summary %}
+    <div style="margin-top: 40px; padding: 20px; background-color: #f0f8ff; border-radius: 15px;">
+      <h3 style="color: #0077b6;">📋 État général du patient</h3>
+      <p><strong>Fréquence cardiaque estimée :</strong> {{ bpm }} battements/min</p>
+      <p><strong>Anomalies détectées :</strong>
+        {% for key, val in summary.items() %}
+          {{ val }} {{ key }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </p>
+    </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 30px;">
+      <a href="{{ url_for('upload_csv') }}" class="cta-button" style="background-color: #1976d2;">🔁 Analyser un autre patient</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - CardioScan | Analyse d'Arythmies Cardiaques{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+  <div class="left">
+    <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" alt="Médecin cartoon" class="hero-image" />
+  </div>
+
+  <div class="right">
+    <h1><i class="fas fa-heartbeat pulse-icon"></i> CardioScan</h1>
+    <h2>Analyse intelligente d'électrocardiogrammes</h2>
+
+    <div class="info-card">
+      <p>
+        Les maladies cardiovasculaires (MCV) sont la <strong>première cause de mortalité dans le monde</strong>,
+        représentant plus de <strong>17 millions de décès</strong> par an.
+      </p>
+      <p>
+        L'arythmie cardiaque, trouble du rythme du cœur, peut être fatale si non détectée à temps.
+        Notre technologie permet une détection rapide et précise des anomalies cardiaques à partir d'images ECG.
+      </p>
+    </div>
+
+    <div class="stats-container">
+      <h3>Impact des maladies cardiovasculaires</h3>
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th>Maladie</th>
+            <th>Décès annuels (monde)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><i class="fas fa-heart-broken"></i> Maladies cardiovasculaires</td>
+            <td>17+ millions</td>
+          </tr>
+          <tr>
+            <td><i class="fas fa-disease"></i> Cancers</td>
+            <td>8.2 millions</td>
+          </tr>
+          <tr>
+            <td><i class="fas fa-lungs"></i> Maladies respiratoires</td>
+            <td>4 millions</td>
+          </tr>
+          <tr>
+            <td><i class="fas fa-prescription"></i> Diabète</td>
+            <td>1.5 million</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tech-info">
+      <h3>Notre technologie</h3>
+      <p>
+        CardioScan utilise un réseau de neurones convolutifs (CNN) avancé pour analyser les images ECG
+        et détecter 8 types d'arythmies différentes avec une précision élevée.
+      </p>
+    </div>
+
+    <!-- ✅ Nouveau bouton qui redirige vers une page d'upload CSV -->
+    <a class="cta-button" href="{{ url_for('upload_csv') }}">
+      <i class="fas fa-stethoscope"></i> Analyser un ECG (Signal .csv)
+    </a>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero-section {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .pulse-icon {
+    animation: pulse 2s infinite;
+    color: #e74c3c;
+  }
+
+  .info-card {
+    background-color: #f8f9fa;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+
+  .stats-container {
+    margin: 30px 0;
+  }
+
+  .stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  .stats-table th {
+    background-color: #3498db;
+    color: white;
+    padding: 12px 15px;
+  }
+
+  .stats-table td {
+    padding: 10px 15px;
+  }
+
+  .stats-table tr:nth-child(odd) {
+    background-color: #f2f2f2;
+  }
+
+  .tech-info {
+    background-color: #e8f4fc;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+  }
+
+  .hero-image {
+    max-width: 350px;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,766 @@
+{% extends "base.html" %}
+
+{% block title %}Analyse ECG - CardioScan{% endblock %}
+
+{% block content %}
+<div class="predict-container">
+  <!-- Animation cardiaque avec signal -->
+  <div class="heart-animation-container">
+    <div class="heart-animation">
+      <img src="{{ url_for('static', filename='predict.png') }}" class="heart-digital-image" alt="ECG Heart">
+    </div>
+    <!-- Signal de battement cardiaque -->
+    <div class="heartbeat-signal">
+      <svg viewBox="0 0 600 120" class="ecg-line">
+        <path class="path" d="M0,60 L30,60 L45,20 L60,90 L80,30 L90,60 L300,60 L320,60 L340,20 L360,100 L380,60 L450,60 L470,10 L480,110 L490,60 L600,60" fill="none" stroke="#3498db" stroke-width="3"></path>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Carte d'analyse -->
+  <div class="analysis-card">
+    <div class="card-header">
+      <h2><i class="fas fa-heartbeat"></i> Analyse d'ECG</h2>
+      <p class="subtitle">Téléchargez une image d'électrocardiogramme pour analyse</p>
+    </div>
+
+    <div class="upload-section">
+      <div class="upload-area" id="drop-area">
+        <input type="file" id="imageUpload" name="file" accept=".png, .jpg, .jpeg" required hidden>
+        <label for="imageUpload" class="upload-label">
+          <i class="fas fa-file-medical"></i>
+          <span>Sélectionner une image ECG</span>
+          <small>ou glisser-déposer ici</small>
+        </label>
+        <p class="file-info">Formats acceptés: JPG, PNG, JPEG</p>
+      </div>
+
+      <div class="preview-section">
+        <div class="img-preview" id="imagePreview">
+          <div class="placeholder-text">
+            <i class="fas fa-image"></i>
+            <p>Aperçu de l'image</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="analyzeBtn" class="analyze-btn">
+      <i class="fas fa-search-plus"></i> Analyser l'ECG
+    </button>
+
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <p>Analyse en cours...</p>
+    </div>
+
+    <div class="result-section" id="resultSection">
+      <h3>Résultat de l'analyse</h3>
+      <div class="result-card">
+        <div class="result-icon">
+          <i class="fas fa-clipboard-check"></i>
+        </div>
+        <div class="result-details">
+          <div class="result-type" id="resultType"></div>
+          <div class="result-abbr" id="resultAbbr"></div>
+          <div class="result-prob" id="resultProb"></div>
+        </div>
+      </div>
+      <div class="result-description" id="resultDescription"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .predict-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    padding: 30px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Container pour l'animation cardiaque et le signal */
+  .heart-animation-container {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  /* Animation cardiaque améliorée */
+  .heart-animation {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+    margin-bottom: 20px;
+  }
+
+  .heart-digital-image {
+    width: 80%;
+    height: auto;
+    animation: heartbeat 1.5s infinite ease-in-out;
+    transform-origin: center center;
+    filter: drop-shadow(0 0 8px rgba(220, 53, 69, 0.5));
+  }
+
+  @keyframes heartbeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.08); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.08); }
+    70% { transform: scale(1); }
+    100% { transform: scale(1); }
+  }
+
+  /* Signal de battement cardiaque */
+  .heartbeat-signal {
+    width: 100%;
+    height: 120px;
+    overflow: hidden;
+    position: relative;
+    margin-top: -10px;
+  }
+
+  .ecg-line {
+    width: 100%;
+    height: 100%;
+  }
+
+  .path {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw 2s linear infinite;
+  }
+
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1000;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .analysis-card {
+    flex: 1;
+    min-width: 300px;
+    max-width: 600px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-header {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .card-header h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+  }
+
+  .upload-section {
+    margin-bottom: 25px;
+  }
+
+  .upload-area {
+    border: 2px dashed #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+  }
+
+  .upload-area.highlight {
+    border-color: #3498db;
+    background-color: #f1f9fe;
+  }
+
+  .upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 15px;
+  }
+
+  .upload-label i {
+    font-size: 24px;
+    color: #3498db;
+    margin-bottom: 10px;
+  }
+
+  .upload-label span {
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .upload-label small {
+    color: #7f8c8d;
+    margin-top: 5px;
+  }
+
+  .file-info {
+    color: #95a5a6;
+    font-size: 0.8rem;
+    margin-top: 10px;
+  }
+
+  .preview-section {
+    margin-top: 20px;
+  }
+
+  .img-preview {
+    width: 100%;
+    height: 200px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+  }
+
+  .placeholder-text {
+    text-align: center;
+    color: #bdc3c7;
+  }
+
+  .placeholder-text i {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+
+  .analyze-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .analyze-btn:hover {
+    background-color: #2980b9;
+  }
+
+  .loader {
+    display: none;
+    text-align: center;
+    margin: 20px 0;
+  }
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .result-section {
+    display: none;
+    margin-top: 30px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+  }
+
+  .result-section h3 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+
+  .result-card {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .result-icon {
+    font-size: 30px;
+    margin-right: 20px;
+    color: #3498db;
+  }
+
+  .result-details {
+    flex: 1;
+  }
+
+  .result-type {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+  }
+
+  .result-abbr {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+  }
+
+  .result-prob {
+    font-size: 0.9rem;
+    color: #2c3e50;
+  }
+
+  .result-description {
+    background-color: #f1f9fe;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    border-radius: 0 5px 5px 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #34495e;
+  }
+
+  .normal-result {
+    border-left-color: #27ae60;
+    background-color: #eafaf1;
+  }
+
+  .warning-result {
+    border-left-color: #f39c12;
+    background-color: #fef5e7;
+  }
+
+  .danger-result {
+    border-left-color: #e74c3c;
+    background-color: #fdedec;
+  }
+
+  /* Boutons supplémentaires pour la section des résultats */
+  .result-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
+  .action-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 5px;
+  }
+
+  .view-details-btn {
+    background-color: #3498db;
+    color: white;
+  }
+
+  .view-details-btn:hover {
+    background-color: #2980b9;
+  }
+
+  .reset-btn {
+    background-color: #e74c3c;
+    color: white;
+  }
+
+  .reset-btn:hover {
+    background-color: #d44637;
+  }
+
+  /* Section de détails supplémentaires */
+  .details-section {
+    display: none;
+    margin-top: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+  }
+
+  .details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .details-header h4 {
+    color: #2c3e50;
+    margin: 0;
+  }
+
+  .close-details {
+    background: none;
+    border: none;
+    color: #7f8c8d;
+    cursor: pointer;
+    font-size: 1.2rem;
+  }
+
+  .details-content {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+  }
+
+  .metric-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .metric-label {
+    color: #7f8c8d;
+  }
+
+  .metric-value {
+    color: #2c3e50;
+    font-weight: bold;
+  }
+
+  /* Médias queries pour la réactivité */
+  @media (max-width: 768px) {
+    .heart-animation-container {
+      margin-bottom: 40px;
+    }
+
+    .heartbeat-signal {
+      height: 100px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('imageUpload');
+    const preview = document.getElementById('imagePreview');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const loader = document.getElementById('loader');
+    const resultSection = document.getElementById('resultSection');
+    const resultType = document.getElementById('resultType');
+    const resultAbbr = document.getElementById('resultAbbr');
+    const resultProb = document.getElementById('resultProb');
+    const resultDescription = document.getElementById('resultDescription');
+
+    // Variables pour stocker les données d'analyse
+    let analysisData = null;
+    let uploadedImageDataUrl = null;
+
+    // Animation améliorée pour l'image du cœur
+    const heartImage = document.querySelector('.heart-digital-image');
+    let pulseIntensity = 0;
+    let increasing = true;
+
+    function animateGlow() {
+      if (increasing) {
+        pulseIntensity += 0.05;
+        if (pulseIntensity >= 1) increasing = false;
+      } else {
+        pulseIntensity -= 0.05;
+        if (pulseIntensity <= 0) increasing = true;
+      }
+
+      heartImage.style.filter = `drop-shadow(0 0 ${5 + pulseIntensity * 5}px rgba(220, 53, 69, ${0.4 + pulseIntensity * 0.3}))`;
+      requestAnimationFrame(animateGlow);
+    }
+
+    animateGlow();
+
+    // Descriptions pour chaque type d'arythmie
+    const descriptions = {
+      'APC': 'La Contraction Auriculaire Prématurée est généralement bénigne et se manifeste par des battements prématurés provenant des oreillettes. Un suivi médical pourrait être recommandé si ces contractions sont fréquentes.',
+      'LBBB': 'Le Bloc de Branche Gauche indique un retard dans la conduction électrique vers le ventricule gauche. Cela peut être associé à diverses pathologies cardiaques et nécessite une évaluation médicale approfondie.',
+      'NOR': 'Rythme cardiaque normal. Aucune anomalie significative n\'a été détectée dans l\'électrocardiogramme analysé.',
+      'PAB': 'Le Bloc Auriculaire Prématuré indique un problème dans la conduction électrique entre les oreillettes et les ventricules. Une consultation cardiologique est recommandée.',
+      'PVC': 'La Contraction Ventriculaire Prématurée correspond à des battements anormaux provenant des ventricules. Bien que souvent bénignes, des PVC fréquentes nécessitent une évaluation médicale.',
+      'RBBB': 'Le Bloc de Branche Droit signale un retard dans la conduction électrique vers le ventricule droit. Un examen cardiologique est conseillé pour déterminer la cause sous-jacente.',
+      'VEB': 'Les Battements Ectopiques Ventriculaires sont des battements anormaux originaires des ventricules. Une consultation médicale est recommandée pour évaluer leur fréquence et leur impact.',
+      'VFE': 'La Fibrillation Ventriculaire est une urgence médicale grave nécessitant une intervention immédiate. Elle se caractérise par un rythme cardiaque chaotique et désorganisé.'
+    };
+
+    // Style des résultats
+    const resultStyles = {
+      'NOR': 'normal-result',
+      'VFE': 'danger-result',
+      'default': 'warning-result'
+    };
+
+    // Prévention du comportement par défaut pour glisser-déposer
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // Mise en évidence de la zone de dépôt
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+      dropArea.classList.add('highlight');
+    }
+
+    function unhighlight() {
+      dropArea.classList.remove('highlight');
+    }
+
+    // Gestion du dépôt de fichier
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+
+      if (files.length) {
+        fileInput.files = files;
+        updatePreview(files[0]);
+      }
+    }
+
+    // Mise à jour de l'aperçu lorsqu'un fichier est sélectionné
+    fileInput.addEventListener('change', function() {
+      if (fileInput.files.length) {
+        updatePreview(fileInput.files[0]);
+      }
+    });
+
+    function updatePreview(file) {
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        uploadedImageDataUrl = e.target.result;
+        preview.innerHTML = '';
+        preview.style.backgroundImage = `url(${uploadedImageDataUrl})`;
+        resultSection.style.display = 'none';
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    // Gestion du clic sur le bouton d'analyse
+    analyzeBtn.addEventListener('click', function() {
+      if (!fileInput.files.length) {
+        alert('Veuillez d\'abord sélectionner une image ECG.');
+        return;
+      }
+
+      // Afficher le chargement
+      analyzeBtn.disabled = true;
+      loader.style.display = 'block';
+      resultSection.style.display = 'none';
+
+      // Création des données du formulaire
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      // Envoi de la requête
+      fetch('/predict', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Stocker les données pour utilisation ultérieure
+        analysisData = data;
+
+        // Masquer le chargement
+        loader.style.display = 'none';
+        analyzeBtn.disabled = false;
+
+        // Ajuster l'animation du signal ECG en fonction du résultat
+        const ecgPath = document.querySelector('.path');
+        if (data.abbreviation === 'NOR') {
+          heartImage.style.animation = 'heartbeat 1.2s infinite ease-in-out';
+          ecgPath.style.animation = 'draw 2s linear infinite';
+        } else if (data.abbreviation === 'VFE') {
+          heartImage.style.animation = 'heartbeat 0.6s infinite ease-in-out';
+          ecgPath.style.animation = 'draw 0.8s linear infinite';
+        } else {
+          heartImage.style.animation = 'heartbeat 1.4s infinite cubic-bezier(0.4, 0, 0.6, 1)';
+          ecgPath.style.animation = 'draw 1.5s linear infinite';
+        }
+
+        // Afficher les résultats
+        resultType.textContent = data.full_name;
+        resultAbbr.textContent = `Code: ${data.abbreviation}`;
+        resultProb.textContent = `Confiance: ${data.probability}`;
+
+        // Afficher la description
+        resultDescription.textContent = descriptions[data.abbreviation] ||
+          'Aucune description disponible pour ce type d\'anomalie.';
+
+        // Appliquer le style approprié
+        resultDescription.className = 'result-description';
+        resultDescription.classList.add(
+          resultStyles[data.abbreviation] || resultStyles.default
+        );
+
+        // Créer les boutons d'action s'ils n'existent pas déjà
+        if (!document.querySelector('.result-actions')) {
+          const actionsDiv = document.createElement('div');
+          actionsDiv.className = 'result-actions';
+
+          // Bouton pour voir les détails
+          const detailsBtn = document.createElement('button');
+          detailsBtn.className = 'action-btn view-details-btn';
+          detailsBtn.innerHTML = '<i class="fas fa-chart-line"></i> Détails';
+          detailsBtn.addEventListener('click', toggleDetailsSection);
+
+          // Bouton de réinitialisation
+          const resetBtn = document.createElement('button');
+          resetBtn.className = 'action-btn reset-btn';
+          resetBtn.innerHTML = '<i class="fas fa-redo"></i> Réinitialiser';
+          resetBtn.addEventListener('click', function() {
+            // Réinitialiser le formulaire
+            fileInput.value = '';
+            preview.style.backgroundImage = '';
+            preview.innerHTML = `
+              <div class="placeholder-text">
+                <i class="fas fa-image"></i>
+                <p>Aperçu de l'image</p>
+              </div>
+            `;
+            resultSection.style.display = 'none';
+            analysisData = null;
+            uploadedImageDataUrl = null;
+
+            // Supprimer la section de détails si elle existe
+            const detailsSection = document.querySelector('.details-section');
+            if (detailsSection) {
+              detailsSection.style.display = 'none';
+            }
+
+            // Réinitialiser l'animation cardiaque
+            heartImage.style.animation = 'heartbeat 1.5s infinite ease-in-out';
+            const ecgPath = document.querySelector('.path');
+            ecgPath.style.animation = 'draw 2s linear infinite';
+          });
+
+          // Ajouter les boutons à la div
+          actionsDiv.appendChild(detailsBtn);
+          actionsDiv.appendChild(resetBtn);
+
+          // Ajouter la div à la section de résultat
+          resultSection.appendChild(actionsDiv);
+
+          // Créer la section de détails
+          const detailsSection = document.createElement('div');
+          detailsSection.className = 'details-section';
+          detailsSection.id = 'detailsSection';
+          detailsSection.innerHTML = `
+            <div class="details-header">
+              <h4>Métriques détaillées</h4>
+              <button class="close-details"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="details-content">
+              <div class="metric-item">
+                <span class="metric-label">Intervalle PR</span>
+                <span class="metric-value">160 ms</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Intervalle QT</span>
+                <span class="metric-value">380 ms</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Intervalle QTc</span>
+                <span class="metric-value">410 ms</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Fréquence cardiaque</span>
+                <span class="metric-value">78 bpm</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Axe électrique</span>
+                <span class="metric-value">+60°</span>
+              </div>
+            </div>
+          `;
+
+          // Ajouter la section de détails après la section de résultat
+          resultSection.parentNode.insertBefore(detailsSection, resultSection.nextSibling);
+
+          // Ajouter l'écouteur d'événement pour fermer les détails
+          detailsSection.querySelector('.close-details').addEventListener('click', function() {
+            detailsSection.style.display = 'none';
+          });
+        }
+
+        // Afficher la section de résultat
+        resultSection.style.display = 'block';
+      })
+      .catch(error => {
+        console.error('Erreur:', error);
+        loader.style.display = 'none';
+        analyzeBtn.disabled = false;
+        alert('Une erreur s\'est produite lors de l\'analyse. Veuillez réessayer.');
+      });
+    });
+
+    // Fonction pour afficher/masquer la section de détails
+    function toggleDetailsSection() {
+      const detailsSection = document.getElementById('detailsSection');
+      if (detailsSection) {
+        detailsSection.style.display = detailsSection.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+  });
+</script>
+{% endblock %}

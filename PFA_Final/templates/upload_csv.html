@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Analyse d’un Signal ECG (.csv){% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px; margin: 50px auto; padding: 30px; background-color: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+
+  <h2 style="text-align: center; color: #2c3e50; margin-bottom: 10px;">📊 Analyse d’un signal ECG</h2>
+  <p style="text-align: center; color: #7f8c8d; margin-bottom: 30px;">
+    Veuillez sélectionner un fichier <strong>.csv</strong> contenant un signal ECG pour détecter automatiquement les battements anormaux.
+  </p>
+
+  <form method="POST" action="/upload_csv" enctype="multipart/form-data" id="csv-form">
+    <div style="margin-bottom: 20px;">
+      <label for="csvUpload" style="font-weight: bold;">📎 Fichier ECG (.csv)</label>
+      <input type="file" name="file" id="csvUpload" accept=".csv" required
+             style="display: block; margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; width: 100%;">
+    </div>
+
+    <button type="submit" class="cta-button" style="width: 100%; background-color: #3498db;">
+      🔍 Lancer l’analyse
+    </button>
+
+    <div id="progress-container" style="display: none; margin-top: 30px;">
+      <p style="color: #7f8c8d;">Analyse en cours...</p>
+      <div style="width: 100%; background-color: #ddd; border-radius: 10px;">
+        <div id="progress-bar" style="width: 0%; height: 20px; background-color: #4caf50; border-radius: 10px;"></div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById("csv-form").addEventListener("submit", function(e) {
+    document.getElementById("progress-container").style.display = "block";
+    let progress = 0;
+    const bar = document.getElementById("progress-bar");
+    const interval = setInterval(() => {
+      if (progress < 90) {
+        progress += 1;
+        bar.style.width = progress + "%";
+      } else {
+        clearInterval(interval);
+      }
+    }, 100);
+  });
+</script>
+{% endblock %}
